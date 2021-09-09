@@ -528,6 +528,16 @@ describe('Parser', () => {
     ).to.equal(`.user h1:matches(.a,.b,:not(.c)){display:none;}`)
   })
 
+  test(':not(&)', () => {
+    expect(
+      stylis(`
+        .owner:not(&) {
+          display: none;
+        }
+      `)
+    ).to.equal(`.owner:not(.user){display:none;}`)
+  })
+
   test('@keyframes', () => {
     expect(serialize(compile(`
       @-webkit-keyframes slidein {
