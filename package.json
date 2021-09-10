@@ -29,6 +29,7 @@
     "pretest": "npm run lint && npm run build",
     "test": "nyc npm run spec",
     "spec": "mocha --harmony --require esm script/setup.js --recursive test",
+    "spec:inspect": "mocha --inspect-brk --harmony --require esm script/setup.js --recursive test",
     "prebuild": "rimraf dist",
     "build": "rollup --config script/build.js --configSrc ./",
     "start": "npm run build -- --watch",
