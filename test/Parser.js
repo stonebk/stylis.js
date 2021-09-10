@@ -1,6 +1,9 @@
 import {compile, serialize, stringify} from "../index.js"
 
-const stylis = string => serialize(compile(`.user{${string}}`), stringify)
+const stylis = string => {
+    const result = compile(`.user{${string}}`);
+    return serialize(result, stringify);;
+}
 
 describe('Parser', () => {
   test('unnested', () => {
@@ -112,7 +115,7 @@ describe('Parser', () => {
     ).to.equal(`.user{color:20px;font-size:20px;}`)
   })
 
-  test('namespace', () => {
+    test('namespace', () => {
     expect(
       stylis(`
         & {
@@ -423,7 +426,8 @@ describe('Parser', () => {
     ].join(''))
   })
 
-  test('[title="a,b"] and :matches(a,b)', () => {
+    test('[title="a,b"] and :matches(a,b)', () => {
+        debugger;
     expect(
       stylis(`
         .test:matches(a,b,c), .test {
@@ -528,6 +532,42 @@ describe('Parser', () => {
     ).to.equal(`.user h1:matches(.a,.b,:not(.c)){display:none;}`)
   })
 
+    test(':matches(:not(&))', () => {
+    expect(
+      stylis(`
+        h1:matches(.a,.b,:not(&)) {
+          display: none
+        }
+      `)
+    ).to.equal(`h1:matches(.a,.b,:not(.user)){display:none;}`)
+  })
+
+  test(':matches(:not(&)) twice', () => {
+    expect(
+      stylis(`
+        h1:matches(.a,.b,:not(&)) {
+          display: none
+        }
+        h2:matches(.a,.b,:not(&)) {
+          display: none
+        }
+      `)
+    ).to.equal([
+        `h1:matches(.a,.b,:not(.user)){display:none;}`,
+        `h2:matches(.a,.b,:not(.user)){display:none;}`
+    ].join(''))
+  })
+
+    test(':matches(&)', () => {
+    expect(
+      stylis(`
+        h1:matches(&,.b,:not(.c)) {
+          display: none
+        }
+      `)
+    ).to.equal(`h1:matches(.user,.b,:not(.c)){display:none;}`)
+  })
+
   test(':not(&)', () => {
     expect(
       stylis(`
@@ -536,6 +576,30 @@ describe('Parser', () => {
         }
       `)
     ).to.equal(`.owner:not(.user){display:none;}`)
+  })
+
+    test(':not(&) 2', () => {
+    expect(
+      stylis(`
+        .owner:not(&) {
+          &:hover {
+            display: none;
+          }
+        }
+      `)
+    ).to.equal(`.owner:not(.user):hover{display:none;}`)
+  })
+
+   test(':not(&) 3', () => {
+    expect(
+      stylis(`
+        .owner:not(&) {
+          .test:matches(&) {
+            display: none;
+          }
+        }
+      `)
+    ).to.equal(`.test:matches(.owner:not(.user)){display:none;}`)
   })
 
   test('@keyframes', () => {
@@ -885,7 +949,8 @@ describe('Parser', () => {
     ].join(''))
   })
 
-  test('nested parenthesis', () => {
+    test('nested parenthesis', () => {
+        debugger;
     expect(stylis(`width: calc(calc(1) + 10);`)).to.equal(`.user{width:calc(calc(1) + 10);}`)
   })
 
